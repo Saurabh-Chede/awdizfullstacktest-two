@@ -1,32 +1,40 @@
 import express from "express";
-import cors from 'cors'
+import cors from "cors";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
-import dotenv from 'dotenv'
+import dotenv from "dotenv";
 import mainRouter from "./routes/index.js";
 
+dotenv.config();
+
 const app = express();
-dotenv.config()
-app.use(express.json())
-app.use(cookieParser())
+
+app.use(express.json());
+app.use(cookieParser());
+
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV === "production"
+        ? process.env.CLIENT_URL
+        : ["http://localhost:5173", "http://localhost:5174"],
+    credentials: true,
+  })
+);
 
 app.get("/", (req, res) => {
-  res.send("server is working");
+  res.send("Server is working");
 });
 
-const corsOptions = {
-  origin: ["http://localhost:5173", "http://localhost:5174"],
-  credentials: true,
-};
-app.use(cors(corsOptions));
+app.use("/api/v1", mainRouter);
 
-app.use('/api/v1', mainRouter);
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log(err));
 
+const PORT = process.env.PORT || 8000;
 
-mongoose.connect(process.env.MONGODB_URI).then(() => {
-  console.log("Connected to MongoDB.");
-});
-
-app.listen(8000, () => {
-  console.log(`server running on port 8000`);
+app.listen(PORT, () => {
+  console.log(`Server running on ${PORT}`);
 });
