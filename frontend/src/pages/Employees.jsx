@@ -38,13 +38,16 @@ const Employees = () => {
   }, [dispatch]);
 
   const fetchUsers = async () => {
-    try {
-      const res = await api.get("/employee/get-employees");
-      setUsers(res.data.users);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  try {
+    const res = await api.get("/employee/employees");
+
+    console.log("FULL RESPONSE:", res.data);
+
+    setUsers(res.data.employees); 
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   const handleChange = (e) => {
     setFormData({

@@ -60,46 +60,10 @@ export const createEmployee = async (req, res) => {
 // Get All Employees
 export const getEmployees = async (req, res) => {
   try {
-    const search = req.query.search || "";
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 5;
-
-    const query = {
-      $or: [
-        {
-          name: {
-            $regex: search,
-            $options: "i",
-          },
-        },
-        {
-          department: {
-            $regex: search,
-            $options: "i",
-          },
-        },
-        {
-          skills: {
-            $regex: search,
-            $options: "i",
-          },
-        },
-      ],
-    };
-
-    const employees = await EmployeeModel.find(query)
-      .populate("userId", "-password")
-      .skip((page - 1) * limit)
-      .limit(limit);
-
-    const totalEmployees =
-      await EmployeeModel.countDocuments(query);
+    const employees = await EmployeeModel.find().populate("userId", "-password");
 
     res.status(200).json({
       success: true,
-      totalEmployees,
-      currentPage: page,
-      totalPages: Math.ceil(totalEmployees / limit),
       employees,
     });
   } catch (error) {
@@ -110,24 +74,6 @@ export const getEmployees = async (req, res) => {
   }
 };
 
-
-export const getEmployeeUsers = async (req, res) => {
-  try {
-    const users = await UserModel.find({ role: "employee" }).select(
-      "_id name email"
-    );
-
-    res.status(200).json({
-      success: true,
-      users,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
 // Update Employee
 export const updateEmployee = async (req, res) => {
   try {

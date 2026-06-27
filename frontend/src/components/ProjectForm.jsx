@@ -3,7 +3,10 @@ const ProjectForm = ({
   handleChange,
   handleSubmit,
   editing,
+  employees = [],
 }) => {
+  console.log("Employees:", employees);
+  console.log(Array.isArray(employees));
   return (
     <form
       onSubmit={handleSubmit}
@@ -14,7 +17,6 @@ const ProjectForm = ({
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
         <input
           type="text"
           name="title"
@@ -45,15 +47,21 @@ const ProjectForm = ({
           required
         />
 
-        <input
-          type="text"
+        <select
           name="employeeId"
-          placeholder="Employee ID"
           value={formData.employeeId}
           onChange={handleChange}
           className="border rounded p-2"
           required
-        />
+        >
+          <option value="">Select Employee</option>
+
+          {employees.map((employee) => (
+            <option key={employee._id} value={employee._id}>
+              {employee.name}
+            </option>
+          ))}
+        </select>
 
         <select
           name="status"
@@ -64,7 +72,6 @@ const ProjectForm = ({
           <option value="pending">Pending</option>
           <option value="completed">Completed</option>
         </select>
-
       </div>
 
       <button

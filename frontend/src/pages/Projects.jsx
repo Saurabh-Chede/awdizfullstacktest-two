@@ -2,18 +2,21 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Navbar from "../components/Navbar";
 import ProjectForm from "../components/ProjectForm";
+import api from "@/config/axiosConfig";
+
 import {
   fetchProjects,
   addProject,
+  updateProject,
+  deleteProject,
 } from "@/store/slices/projectSlice";
 
 const Projects = () => {
   const dispatch = useDispatch();
 
-  const { projects, loading } = useSelector(
-    (state) => state.project
-  );
+  const { projects, loading } = useSelector((state) => state.project);
 
+  const [employees, setEmployees] = useState([]);
   const [editing, setEditing] = useState(false);
   const [editId, setEditId] = useState(null);
 
@@ -27,7 +30,13 @@ const Projects = () => {
 
   useEffect(() => {
     dispatch(fetchProjects());
+    fetchEmployees();
   }, [dispatch]);
+
+  const fetchEmployees = async () => {
+  const res = await api.get("/employee/employees");
+  setEmployees(res.data.employees);
+};
 
   const handleChange = (e) => {
     setFormData({
@@ -40,7 +49,12 @@ const Projects = () => {
     e.preventDefault();
 
     if (editing) {
-      dispatch(updateProject({ id: editId, data: formData }));
+      dispatch(
+        updateProject({
+          id: editId,
+          data: formData,
+        }),
+      );
     } else {
       dispatch(addProject(formData));
     }
@@ -71,7 +85,9 @@ const Projects = () => {
   };
 
   const handleDelete = (id) => {
-    dispatch(deleteProject(id));
+    if (window.confirm("Delete this project?")) {
+      dispatch(deleteProject(id));
+    }
   };
 
   return (
@@ -79,15 +95,14 @@ const Projects = () => {
       <Navbar />
 
       <div className="max-w-7xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">
-          Project Management
-        </h1>
+        <h1 className="text-3xl font-bold mb-6">Project Management</h1>
 
         <ProjectForm
           formData={formData}
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           editing={editing}
+          employees={employees}
         />
 
         <div className="mt-8 bg-white rounded-lg shadow overflow-hidden">
@@ -118,23 +133,14 @@ const Projects = () => {
                 </tr>
               ) : (
                 projects.map((project) => (
-                  <tr
-                    key={project._id}
-                    className="border-b hover:bg-gray-100"
-                  >
+                  <tr key={project._id} className="border-b hover:bg-gray-100">
                     <td className="p-3">{project.title}</td>
 
-                    <td className="p-3">
-                      {project.description}
-                    </td>
+                    <td className="p-3">{project.description}</td>
 
-                    <td className="p-3">
-                      ₹{project.budget}
-                    </td>
+                    <td className="p-3">₹{project.budget}</td>
 
-                    <td className="p-3">
-                      {project.employeeId?.name || "N/A"}
-                    </td>
+                    <td className="p-3">{project.employeeId?.name || "N/A"}</td>
 
                     <td className="p-3">
                       <span
@@ -157,9 +163,7 @@ const Projects = () => {
                       </button>
 
                       <button
-                        onClick={() =>
-                          handleDelete(project._id)
-                        }
+                        onClick={() => handleDelete(project._id)}
                         className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded"
                       >
                         Delete

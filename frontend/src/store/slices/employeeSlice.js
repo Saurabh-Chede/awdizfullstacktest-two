@@ -4,7 +4,7 @@ export const fetchEmployees = createAsyncThunk(
   "employee/fetch",
   async (_, thunkAPI) => {
     try {
-      const res = await api.get("/employee/getemployee");
+      const res = await api.get("/employee/employees");
       return res.data.employees;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data.message);
@@ -28,7 +28,7 @@ export const updateEmployee = createAsyncThunk(
   "employee/update",
   async ({ id, data }, thunkAPI) => {
     try {
-      const res = await api.put(`/employees/${id}`, data);
+      const res = await api.put(`/employee/update/${id}`, data);
       return res.data.employee;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data.message);

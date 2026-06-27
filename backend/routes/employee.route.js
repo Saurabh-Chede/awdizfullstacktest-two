@@ -4,7 +4,6 @@ import {
   getEmployees,
   updateEmployee,
   deleteEmployee,
-  getEmployeeUsers,
 } from "../controllers/employee.controller.js";
 
 import {
@@ -15,9 +14,8 @@ import {
 const router = express.Router();
 
 router.post("/create-employee", verifyAndDecodeToken, isAdmin, createEmployee);
-router.get("/getemployee", verifyAndDecodeToken, getEmployees);
 router.put("/update/:id", verifyAndDecodeToken, isAdmin, updateEmployee);
 router.delete("/delete/:id", verifyAndDecodeToken, isAdmin, deleteEmployee);
-router.get('/get-employees',getEmployeeUsers)
+router.get('/employees',verifyAndDecodeToken, getEmployees)
 
 export default router;

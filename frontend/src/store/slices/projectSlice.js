@@ -25,6 +25,33 @@ export const addProject = createAsyncThunk(
   }
 );
 
+export const deleteProject = createAsyncThunk(
+  "project/delete",
+  async (id, thunkAPI) => {
+    try {
+      await api.delete(`/project/delete/${id}`);
+      return id;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response.data.message);
+    }
+  }
+);
+
+export const updateProject = createAsyncThunk(
+  "project/update",
+  async ({ id, data }, thunkAPI) => {
+    try {
+      const res = await api.put(
+        `/project/update-project/${id}`,
+        data
+      );
+      return res.data.project;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response.data.message);
+    }
+  }
+);
+
 const projectSlice = createSlice({
   name: "project",
 
@@ -50,7 +77,21 @@ const projectSlice = createSlice({
 
       .addCase(addProject.fulfilled, (state, action) => {
         state.projects.push(action.payload);
-      });
+      })
+
+    .addCase(updateProject.fulfilled, (state, action) => {
+      state.projects = state.projects.map((project) =>
+        project._id === action.payload._id
+          ? action.payload
+          : project
+      );
+    })
+
+    .addCase(deleteProject.fulfilled, (state, action) => {
+      state.projects = state.projects.filter(
+        (project) => project._id !== action.payload
+      );
+    });
   },
 });
 
