@@ -3,6 +3,7 @@ const EmployeeForm = ({
   handleChange,
   handleSubmit,
   editing,
+  users,
 }) => {
   return (
     <form
@@ -14,7 +15,6 @@ const EmployeeForm = ({
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
         <input
           type="text"
           name="name"
@@ -64,15 +64,25 @@ const EmployeeForm = ({
           className="border rounded p-2 md:col-span-2"
         />
 
-        {/* If your backend requires userId */}
-        <input
-          type="text"
+        <select
           name="userId"
-          placeholder="User ID"
-          value={formData.userId || ""}
+          value={formData.userId}
           onChange={handleChange}
           className="border rounded p-2 md:col-span-2"
-        />
+          required
+        >
+          <option value="">Select User</option>
+
+          {users?.length > 0 ? (
+            users.map((user) => (
+              <option key={user._id} value={user._id}>
+                {user.name} ({user.email})
+              </option>
+            ))
+          ) : (
+            <option disabled>No Employee Users Found</option>
+          )}
+        </select>
       </div>
 
       <button

@@ -1,13 +1,37 @@
 import EmployeeModel from "../models/employee.model.js";
+import UserModel from "../models/user.model.js";
 
+// Create Employee
 export const createEmployee = async (req, res) => {
   try {
-    const { name, age, department, salary, skills } = req.body;
+    const {
+      name,
+      age,
+      department,
+      salary,
+      skills,
+      userId,
+    } = req.body;
 
-    if (!name || !age || !department || !salary) {
+    if (
+      !name ||
+      !age ||
+      !department ||
+      !salary ||
+      !userId
+    ) {
       return res.status(400).json({
         success: false,
         message: "All fields are required.",
+      });
+    }
+
+    const existingEmployee = await EmployeeModel.findOne({ userId });
+
+    if (existingEmployee) {
+      return res.status(400).json({
+        success: false,
+        message: "Employee already exists for this user.",
       });
     }
 
@@ -17,7 +41,7 @@ export const createEmployee = async (req, res) => {
       department,
       salary,
       skills,
-      userId: req.userId,
+      userId,
     });
 
     res.status(201).json({
@@ -33,7 +57,7 @@ export const createEmployee = async (req, res) => {
   }
 };
 
-
+// Get All Employees
 export const getEmployees = async (req, res) => {
   try {
     const search = req.query.search || "";
@@ -42,9 +66,24 @@ export const getEmployees = async (req, res) => {
 
     const query = {
       $or: [
-        { name: { $regex: search, $options: "i" } },
-        { department: { $regex: search, $options: "i" } },
-        { skills: { $regex: search, $options: "i" } },
+        {
+          name: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          department: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          skills: {
+            $regex: search,
+            $options: "i",
+          },
+        },
       ],
     };
 
@@ -53,7 +92,8 @@ export const getEmployees = async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalEmployees = await EmployeeModel.countDocuments(query);
+    const totalEmployees =
+      await EmployeeModel.countDocuments(query);
 
     res.status(200).json({
       success: true,
@@ -70,16 +110,35 @@ export const getEmployees = async (req, res) => {
   }
 };
 
+
+export const getEmployeeUsers = async (req, res) => {
+  try {
+    const users = await UserModel.find({ role: "employee" }).select(
+      "_id name email"
+    );
+
+    res.status(200).json({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+// Update Employee
 export const updateEmployee = async (req, res) => {
   try {
-    const employee = await Employee.findByIdAndUpdate(
+    const employee = await EmployeeModel.findByIdAndUpdate(
       req.params.id,
       req.body,
       {
         new: true,
         runValidators: true,
       }
-    );
+    ).populate("userId", "-password");
 
     if (!employee) {
       return res.status(404).json({
@@ -101,10 +160,11 @@ export const updateEmployee = async (req, res) => {
   }
 };
 
-
+// Delete Employee
 export const deleteEmployee = async (req, res) => {
   try {
-    const employee = await EmployeeModel.findByIdAndDelete(req.params.id);
+    const employee =
+      await EmployeeModel.findByIdAndDelete(req.params.id);
 
     if (!employee) {
       return res.status(404).json({

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Navbar from "../components/Navbar";
 import EmployeeForm from "../components/EmployeeForm";
 import EmployeeTable from "../components/EmployeeTable";
+import api from "@/config/axiosConfig";
 import {
   fetchEmployees,
   addEmployee,
@@ -19,6 +20,7 @@ const Employees = () => {
 
   const [editing, setEditing] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [users, setUsers] = useState([]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -26,11 +28,23 @@ const Employees = () => {
     department: "",
     salary: "",
     skills: "",
+    userId: "",
   });
 
   useEffect(() => {
     dispatch(fetchEmployees());
+
+    fetchUsers();
   }, [dispatch]);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await api.get("/employee/get-employees");
+      setUsers(res.data.users);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -61,6 +75,7 @@ const Employees = () => {
       department: "",
       salary: "",
       skills: "",
+      userId: "",
     });
 
     setEditing(false);
@@ -72,8 +87,12 @@ const Employees = () => {
     setEditId(emp._id);
 
     setFormData({
-      ...emp,
+      name: emp.name,
+      age: emp.age,
+      department: emp.department,
+      salary: emp.salary,
       skills: emp.skills.join(", "),
+      userId: emp.userId?._id || "",
     });
   };
 
@@ -95,6 +114,7 @@ const Employees = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           editing={editing}
+          users={users}
         />
 
         {loading ? (
