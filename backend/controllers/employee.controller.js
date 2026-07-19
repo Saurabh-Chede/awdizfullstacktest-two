@@ -4,22 +4,9 @@ import UserModel from "../models/user.model.js";
 // Create Employee
 export const createEmployee = async (req, res) => {
   try {
-    const {
-      name,
-      age,
-      department,
-      salary,
-      skills,
-      userId,
-    } = req.body;
+    const { name, age, department, salary, skills, userId } = req.body;
 
-    if (
-      !name ||
-      !age ||
-      !department ||
-      !salary ||
-      !userId
-    ) {
+    if (!name || !age || !department || !salary || !userId) {
       return res.status(400).json({
         success: false,
         message: "All fields are required.",
@@ -44,10 +31,14 @@ export const createEmployee = async (req, res) => {
       userId,
     });
 
+    const populatedEmployee = await EmployeeModel.findById(
+      employee._id,
+    ).populate("userId", "-password");
+
     res.status(201).json({
       success: true,
       message: "Employee created successfully.",
-      employee,
+      employee: populatedEmployee,
     });
   } catch (error) {
     res.status(500).json({
@@ -60,7 +51,10 @@ export const createEmployee = async (req, res) => {
 // Get All Employees
 export const getEmployees = async (req, res) => {
   try {
-    const employees = await EmployeeModel.find().populate("userId", "-password");
+    const employees = await EmployeeModel.find().populate(
+      "userId",
+      "-password",
+    );
 
     res.status(200).json({
       success: true,
@@ -83,7 +77,7 @@ export const updateEmployee = async (req, res) => {
       {
         new: true,
         runValidators: true,
-      }
+      },
     ).populate("userId", "-password");
 
     if (!employee) {
@@ -109,8 +103,7 @@ export const updateEmployee = async (req, res) => {
 // Delete Employee
 export const deleteEmployee = async (req, res) => {
   try {
-    const employee =
-      await EmployeeModel.findByIdAndDelete(req.params.id);
+    const employee = await EmployeeModel.findByIdAndDelete(req.params.id);
 
     if (!employee) {
       return res.status(404).json({
@@ -133,10 +126,7 @@ export const deleteEmployee = async (req, res) => {
 
 export const getEmployeeUsers = async (req, res) => {
   try {
-    const users = await UserModel.find(
-      { role: "employee" },
-      "-password"
-    );
+    const users = await UserModel.find({ role: "employee" }, "-password");
 
     res.status(200).json({
       success: true,
