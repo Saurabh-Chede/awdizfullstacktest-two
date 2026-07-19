@@ -130,3 +130,22 @@ export const deleteEmployee = async (req, res) => {
     });
   }
 };
+
+export const getEmployeeUsers = async (req, res) => {
+  try {
+    const users = await UserModel.find(
+      { role: "employee" },
+      "-password"
+    );
+
+    res.status(200).json({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
