@@ -8,23 +8,55 @@ import Dashboard from "./pages/AdminDashboard";
 import Employees from "./pages/Employees";
 import Projects from "./pages/Projects";
 import { getCurrentUser } from "./store/slices/authSlice";
-
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-   useEffect(() => {
+  useEffect(() => {
     dispatch(getCurrentUser());
   }, []);
-  
+
   return (
     <Routes>
-      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/employee-dashboard" element={<EmployeeDashboard/>}/>
-      <Route path="/employees" element={<Employees></Employees>}></Route>
-      <Route path="/projects" element={<Projects/>}></Route>
+
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/employees"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <Employees />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/projects"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <Projects />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/employee-dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["employee"]}>
+            <EmployeeDashboard />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
