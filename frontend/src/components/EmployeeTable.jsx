@@ -7,6 +7,7 @@ const EmployeeTable = ({ employees, onEdit, onDelete }) => {
     );
   }
 
+  console.log(employees);
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden mt-8">
       <table className="w-full border-collapse">
@@ -24,10 +25,7 @@ const EmployeeTable = ({ employees, onEdit, onDelete }) => {
 
         <tbody>
           {employees.map((employee) => (
-            <tr
-              key={employee._id}
-              className="border-b hover:bg-gray-100"
-            >
+            <tr key={employee._id} className="border-b hover:bg-gray-100">
               <td className="p-3">{employee.name}</td>
 
               <td className="p-3">{employee.age}</td>
@@ -36,13 +34,9 @@ const EmployeeTable = ({ employees, onEdit, onDelete }) => {
 
               <td className="p-3">₹{employee.salary}</td>
 
-              <td className="p-3">
-                {employee.skills?.join(", ")}
-              </td>
+              <td className="p-3">{employee.skills?.join(", ")}</td>
 
-              <td className="p-3">
-                {employee.userId?.name || "N/A"}
-              </td>
+              <td className="p-3">{employee.userId?.name || "N/A"}</td>
 
               <td className="p-3 flex justify-center gap-2">
                 <button
