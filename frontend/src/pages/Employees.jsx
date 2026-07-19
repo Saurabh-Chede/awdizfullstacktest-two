@@ -39,11 +39,11 @@ const Employees = () => {
 
   const fetchUsers = async () => {
   try {
-    const res = await api.get("/employee/employees");
+    const res = await api.get("/employee/users");
 
     console.log("FULL RESPONSE:", res.data);
 
-    setUsers(res.data.employees); 
+    setUsers(res.data.users); 
   } catch (error) {
     console.log(error);
   }
