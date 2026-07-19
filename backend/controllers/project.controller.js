@@ -36,7 +36,7 @@ export const createProject = async (req, res) => {
       status,
     });
 
-    const populatedProject = await ProjectModel.findById(project._id).populate(employeeId)
+    const populatedProject = await ProjectModel.findById(project._id).populate("employeeId")
 
     res.status(201).json({
       success: true,
