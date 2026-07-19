@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch ,useSelector} from "react-redux";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
@@ -12,10 +12,18 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
   const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(getCurrentUser());
-  }, []);
+  }, [dispatch]);
+
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
+
+  console.log('App',loading)
+  
 
   return (
     <Routes>
