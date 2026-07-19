@@ -36,10 +36,12 @@ export const createProject = async (req, res) => {
       status,
     });
 
+    const populatedProject = await ProjectModel.findById(project._id).populate(employeeId)
+
     res.status(201).json({
       success: true,
       message: "Project created successfully.",
-      project,
+      project:populatedProject,
     });
   } catch (error) {
     res.status(500).json({
